@@ -129,10 +129,12 @@ spec:
           secretName: {{ $secretName }}
       {{- end }}
       {{- with .Values.leafnodes.tls }}
+      {{- if not .custom }}
       {{ $secretName := .secret.name }}
       - name: {{ $secretName }}-leafnodes-volume
         secret:
           secretName: {{ $secretName }}
+      {{- end }}
       {{- end }}
       {{- with .Values.gateway.tls }}
       {{ $secretName := .secret.name }}
@@ -158,6 +160,8 @@ spec:
       {{- end }}
       {{- end }}
       {{- end }}
+
+      {{- toYaml .Values.additionalVolumes | nindent 6 }}
 
       {{ if and .Values.nats.externalAccess .Values.nats.advertise }}
       # Assume that we only use the service account in case we want to
@@ -319,14 +323,18 @@ spec:
             mountPath: /etc/nats-certs/mqtt/{{ $secretName }}
           {{- end }}
           {{- with .Values.cluster.tls }}
+          {{- if not .custom }}
           {{ $secretName := .secret.name }}
           - name: {{ $secretName }}-cluster-volume
             mountPath: /etc/nats-certs/cluster/{{ $secretName }}
           {{- end }}
+          {{- end }}
           {{- with .Values.leafnodes.tls }}
+          {{- if not .custom }}
           {{ $secretName := .secret.name }}
           - name: {{ $secretName }}-leafnodes-volume
             mountPath: /etc/nats-certs/leafnodes/{{ $secretName }}
+          {{- end }}
           {{- end }}
           {{- with .Values.gateway.tls }}
           {{ $secretName := .secret.name }}
@@ -351,6 +359,8 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
+
+          {{- toYaml .Values.additionalVolumeMounts | nindent 10 }}
 
         # Liveness/Readiness probes against the monitoring.
         #
@@ -407,6 +417,7 @@ spec:
             mountPath: /etc/nats-config
           - name: pid
             mountPath: /var/run/nats
+          {{- toYaml .Values.additionalVolumeMounts | nindent 10 }}
       {{ end }}
 
       ##############################

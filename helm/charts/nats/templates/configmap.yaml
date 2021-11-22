@@ -158,9 +158,15 @@ data:
       {{- end }}
 
       {{- with .Values.leafnodes.tls }}
+      {{- if .custom }}
+      tls {
+        {{- .custom | nindent 8 }}
+      }
+      {{- else }}
       {{-  $leafnode_tls := merge (dict) . }}
       {{- $_ := set $leafnode_tls "secretPath" "/etc/nats-certs/leafnodes" }}
       {{- include "nats.tlsConfig" $leafnode_tls | nindent 6}}
+      {{- end }}
       {{- end }}
 
       remotes: [
@@ -175,8 +181,11 @@ data:
         {{- end }}
 
         {{- with .tls }}
-        {{ $secretName := .secret.name }}
         tls: {
+          {{- if .custom }}
+          {{- .custom | nindent 10 }}
+          {{- else }}
+          {{ $secretName := .secret.name }}
           {{- with .cert }}
           cert_file: /etc/nats-certs/leafnodes/{{ $secretName }}/{{ . }}
           {{- end }}
@@ -187,6 +196,7 @@ data:
 
           {{- with .ca }}
           ca_file: /etc/nats-certs/leafnodes/{{ $secretName }}/{{ . }}
+          {{- end }}
           {{- end }}
         }
         {{- end }}
