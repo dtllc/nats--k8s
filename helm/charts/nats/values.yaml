@@ -176,6 +176,9 @@ statefulSetAnnotations: {}
 # Annotations to add to the NATS Service
 serviceAnnotations: {}
 
+# additionalContainers are the sidecar containers to add to the NATS StatefulSet
+additionalContainers: []
+
 cluster:
   enabled: false
   replicas: 3
