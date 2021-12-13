@@ -185,9 +185,11 @@ spec:
           secretName: {{ .secret.name }}
       {{- end }}
       {{- with .tls }}
+      {{- if not .custom }}
       - name: {{ .secret.name }}-volume
         secret:
           secretName: {{ .secret.name }}
+      {{- end }}
       {{- end }}
       {{- end }}
       {{- end }}
@@ -389,8 +391,10 @@ spec:
           mountPath: /etc/nats-creds/{{ .secret.name }}
         {{- end }}
         {{- with .tls }}
+        {{- if not .custom }}
         - name: {{ .secret.name }}-volume
           mountPath: /etc/nats-certs/leafnodes/{{ .secret.name }}
+        {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}
